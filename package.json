@@ -1,0 +1,66 @@
+{
+  "name": "qris-dynamicify",
+  "version": "1.0.0",
+  "description": "Transform static QRIS into dynamic QRIS effortlessly. Designed for modern payment integrations in Indonesia.",
+  "keywords": [
+    "qris",
+    "qris-dynamic",
+    "qris-static",
+    "qris-converter",
+    "indonesia-payment",
+    "payment",
+    "qr-code",
+    "qr-payment"
+  ],
+  "homepage": "https://github.com/XanderID/qris-dynamicify#readme",
+  "bugs": {
+    "url": "https://github.com/XanderID/qris-dynamicify/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XanderID/qris-dynamicify.git"
+  },
+  "license": "MIT",
+  "author": "XanderID",
+  "main": "dist/cjs/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "default": "./dist/esm/index.js"
+    }
+  },
+  "scripts": {
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "jimp": "^1.6.0",
+    "jsqr": "^1.4.0",
+    "qrcode": "^1.5.4",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/jimp": "^0.2.1",
+    "@types/node": "^24.5.2",
+    "@types/qrcode": "^1.5.5",
+    "@typescript-eslint/eslint-plugin": "^8.44.1",
+    "@typescript-eslint/parser": "^8.44.1",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.1"
+  }
+}
