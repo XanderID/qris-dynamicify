@@ -37,6 +37,12 @@ yarn add qris-dynamicify
 <script src="https://unpkg.com/qris-dynamicify@1.1.0/dist/browser/qris-dynamicify.js"></script>
 ```
 
+## Live Demo
+
+You can try QRIS Dynamicify directly in your browser:
+
+[https://xanderid.github.io/qris-dynamicify/](https://xanderid.github.io/qris-dynamicify/)
+
 ## Usage Instructions
 
 Here’s how to get started with `qris-dynamicify`. The library supports both ES Module (import) and CommonJS (require) syntax.
