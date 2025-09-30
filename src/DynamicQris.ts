@@ -1,14 +1,13 @@
-import fs from "fs/promises";
-import path from "path";
 import { extractMetadata, type QrisMetadata } from "./metadata/metadata.js";
-import QRCode, { type QRCodeToFileOptions } from "qrcode";
 import { readFileAsQris } from "./parser/qrImageParser.js";
 import {
   setPrice as setPriceQR,
   setTax as setTaxQR,
 } from "./utils/DynamicUtils.js";
+import { isNode } from "./utils/env.js";
+import type { QRCodeToDataURLOptions, QRCodeToFileOptions } from "qrcode";
 
-class DynamicQris {
+export class DynamicQris {
   private qris: string;
   private price: number = 0;
   private taxAmount: number = 0;
@@ -37,6 +36,7 @@ class DynamicQris {
 
   /**
    * Sets the tax for the transaction.
+   * Note: Not all providers support tax
    * @param tax - Either a number (nominal) or a string percentage (e.g., "10%")
    * @returns The current DynamicQris instance for chaining
    * @example
@@ -81,7 +81,7 @@ class DynamicQris {
   }
 
   /**
-   * Writes the current QRIS string to a file.
+   * Writes the current QRIS string to a file (Node.js only).
    * - If .txt saves plain text
    * - If .png/.jpg saves QR image
    * @param path File path where the QRIS should be saved
@@ -92,6 +92,14 @@ class DynamicQris {
     filePath: string,
     options: QRCodeToFileOptions = {}
   ): Promise<string> {
+    if (!isNode) {
+      throw new Error("writeToFile is only available in Node.js environment.");
+    }
+
+    const { default: fs } = await import("fs/promises");
+    const { default: path } = await import("path");
+    const { default: QRCode } = await import("qrcode");
+
     const ext = path.extname(filePath).toLowerCase();
 
     if (ext === ".txt") {
@@ -108,6 +116,23 @@ class DynamicQris {
     }
 
     return filePath;
+  }
+
+  /**
+   * Generate QRIS as a base64 data URL (Browser only).
+   * - Useful for <img src="..."> or direct embedding
+   * @param options QR code render options
+   * @returns Base64 data URL string
+   */
+  async writeToDataURL(options: QRCodeToDataURLOptions = {}): Promise<string> {
+    const { default: QRCode } = await import("qrcode");
+
+    return await QRCode.toDataURL(this.qris, {
+      type: "image/png",
+      margin: 2,
+      width: 300,
+      ...options,
+    });
   }
 
   /**
@@ -137,14 +162,22 @@ export async function fromString(staticQris: string): Promise<DynamicQris> {
 }
 
 /**
- * Generates a dynamic QRIS from a file containing a static QRIS string.
- * @param filePath - The path to the static QRIS file
- * @returns A promise that resolves to a DynamicQris instance
+ * Generates a dynamic QRIS from various sources.
+ * @param input - The source of the static QRIS. Can be a file path (Node.js),
+ *                or a File, Blob, HTMLImageElement, HTMLCanvasElement (Browser).
+ * @returns A promise that resolves to a DynamicQris instance.
  * @example
+ * // Node.js
  * const dynamic = await fromFile("staticQris.png");
- * dynamic.setPrice(5000).setTax(500).writeToFile("dynamic.png");
+ *
+ * // Browser
+ * const fileInput = document.getElementById('qrisFileInput');
+ * const file = fileInput.files[0];
+ * const dynamic = await fromFile(file);
  */
-export async function fromFile(filePath: string): Promise<DynamicQris> {
-  const staticQris = await readFileAsQris(filePath);
+export async function fromFile(
+  input: string | File | Blob | HTMLImageElement | HTMLCanvasElement
+): Promise<DynamicQris> {
+  const staticQris = await readFileAsQris(input);
   return fromString(staticQris);
 }

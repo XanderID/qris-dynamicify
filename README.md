@@ -31,6 +31,12 @@ npm install qris-dynamicify
 yarn add qris-dynamicify
 ```
 
+### via browser (CDN)
+
+```html
+<script src="https://unpkg.com/qris-dynamicify@1.1.0/dist/browser/qris-dynamicify.js"></script>
+```
+
 ## Usage Instructions
 
 Here’s how to get started with `qris-dynamicify`. The library supports both ES Module (import) and CommonJS (require) syntax.
@@ -102,6 +108,13 @@ async function generateFromImage() {
 generateFromImage();
 ```
 
+### Example: Browser Usage
+
+Besides Node.js, **qris-dynamicify** also works directly in the browser.  
+This is useful if you want to let users upload their static QRIS image and generate a dynamic QRIS instantly on the client side.
+
+For working demos, please check the [examples/browser](https://github.com/XanderID/qris-dynamicify/tree/main/examples/browser) folder in this repository.
+
 ## API Documentation
 
 The main entry points are `fromString` and `fromFile`, which return a `DynamicQris` instance.
@@ -113,11 +126,13 @@ The main entry points are `fromString` and `fromFile`, which return a `DynamicQr
   - `staticQris` (string): The raw static QRIS data.
 - **Returns**: A `Promise` that resolves to a `DynamicQris` instance.
 
-### `fromFile(filePath: string): Promise<DynamicQris>`
+### `fromFile(input: string | File | Blob | HTMLImageElement | HTMLCanvasElement): Promise<DynamicQris>`
 
-- **Description**: Creates a `DynamicQris` instance from an image file containing a static QRIS code.
+- **Description**: Creates a `DynamicQris` instance from various sources.
 - **Parameters**:
-  - `filePath` (string): The path to the image file (`.png`, `.jpg`).
+  - `input`:
+    - **Node.js**: A file path (`string`) pointing to an image file (`.png`, `.jpg`) or a `Blob`.
+    - **Browser**: Can be a `File`, `Blob`, `HTMLImageElement`, or `HTMLCanvasElement`.
 - **Returns**: A `Promise` that resolves to a `DynamicQris` instance.
 
 ### `DynamicQris` Class
@@ -150,6 +165,14 @@ An instance of this class is returned by the factory functions.
   - `filePath` (string): The destination file path. Supports `.png`, `.jpg`, and `.txt`.
   - `options` (object, optional): Options for QR code generation (from the `qrcode` library).
 - **Returns**: A `Promise` that resolves with the file path.
+
+### `writeToDataURL(options?: QRCodeToDataURLOptions): Promise<string>`
+
+- **Description**: Generates the current QRIS as a **Base64 data URL** (Browser only).  
+  Useful for embedding directly into an `<img src="...">` tag, Canvas, or downloading as an image.
+- **Parameters**:
+  - `options` (object, optional): QR code rendering options from the [`qrcode`](https://github.com/soldair/node-qrcode) library (e.g., `margin`, `width`, `color`, etc.).
+- **Returns**: A `Promise` that resolves to a Base64-encoded string representing the QR image.
 
 #### `toString(): string`
 
@@ -191,7 +214,7 @@ We welcome contributions! Please follow these steps:
 ## Roadmap
 
 - [ ] CLI tool for quick conversions from the terminal.
-- [ ] Browser-compatible version.
+- [x] Browser-compatible version.
 - [ ] Add more examples and detailed documentation.
 
 ## License
